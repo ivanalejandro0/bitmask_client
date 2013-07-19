@@ -29,6 +29,8 @@ from leap.bitmask.util.leap_log_handler import LeapLogHandler
 from leap.bitmask.util.streamtologger import StreamToLogger
 from leap.common.events import server as event_server
 
+from leap.services.chat.chatwindow import ChatWindow
+
 import codecs
 codecs.register(lambda name: codecs.lookup('utf-8')
                 if name == 'cp65001' else None)
@@ -219,6 +221,9 @@ def main():
         standalone=standalone,
         openvpn_verb=openvpn_verb,
         bypass_checks=bypass_checks)
+
+    chat = ChatWindow()
+    chat.show()
 
     sigint_window = partial(sigint_handler, window, logger=logger)
     signal.signal(signal.SIGINT, sigint_window)
