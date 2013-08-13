@@ -93,6 +93,11 @@ class Controller(QtCore.QObject):
         self._user_from = ''
         self._user_to = ''
 
+        self._chat_store = None
+
+        # list to store messages that can't be saved until soledad is available
+        self._not_saved_msgs = []
+
     @QtCore.Slot(QtCore.QObject)
     def itemSelected(self, wrapper):
         print 'User clicked on:', wrapper
@@ -142,7 +147,37 @@ class Controller(QtCore.QObject):
 
         message.setProperty('text', '')
 
-    def new_message(self, sender, message):
+    def new_message(self, sender, message, store=True):
         logger.debug('new message')
-        msg = MessageWrapper(Message(message, sender))
-        self._model.addItem(msg)
+        msg = Message(message, sender)
+        msgw = MessageWrapper(msg)
+        self._model.addItem(msgw)
+
+        if not store:
+            return
+
+        if self._chat_store is None:
+            self._not_saved_msgs.append(msg)
+        else:
+            self._chat_store.save_chat(msg)
+
+    def _load_history(self):
+        chatlist = self._chat_store.chatlist
+        for chat in chatlist:
+            logger.debug("processing chat: %s" % chat)
+            logger.debug('Chat content: {0}'.format(chat.content))
+            logger.debug('Chat with: {0}'.format(chat.content['chat-with']))
+            for msg in chat.content['chats']:
+                logger.debug('  {0} say: {1}'.format(msg['from'], msg['msg']))
+                self.new_message(msg['from'], msg['msg'], store=False)
+
+            return
+
+    def set_chat_store(self, chat_store):
+        self._chat_store = chat_store
+        self._chat_store.fetch(self._user_to)
+        self._chat_store.chat_logs_ready.connect(self._load_history)
+
+        # save pending messages into store
+        for msg in self._not_saved_msgs:
+            chat_store.save_chat(msg)

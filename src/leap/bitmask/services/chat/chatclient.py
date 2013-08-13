@@ -59,7 +59,7 @@ class ChatClient(QtCore.QObject):
         presence = domish.Element(('jabber:client', 'presence'))
         xml_stream.send(presence)
 
-        xml_stream.addObserver('/message',  self.got_message)
+        xml_stream.addObserver('/message', self.got_message)
         # xml_stream.addObserver('/presence', self.debug)
         # xml_stream.addObserver('/iq',       self.debug)
 

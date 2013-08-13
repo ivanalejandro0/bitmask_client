@@ -8,6 +8,7 @@ from messages import Controller, MessageListModel
 from messages import Message, MessageWrapper
 
 from utils import get_log_handler
+from chatstore import ChatStore
 
 logger = get_log_handler(__name__)
 
@@ -30,13 +31,14 @@ def get_demo_messages():
 
 
 class ChatWindow(QtGui.QMainWindow):
-    def __init__(self):
+    def __init__(self, window):
         QtGui.QMainWindow.__init__(self)
 
         view = QtDeclarative.QDeclarativeView()
         view.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
 
-        messages_model = MessageListModel(get_demo_messages())
+        # messages_model = MessageListModel(get_demo_messages())
+        messages_model = MessageListModel()
         self._controller = controller = Controller(messages_model)
 
         # Add context properties to use this objects from qml
@@ -53,12 +55,23 @@ class ChatWindow(QtGui.QMainWindow):
 
         self.setCentralWidget(view)
 
+        self._window = window
+        window.soledad_ready.connect(self._create_chat_store)
+
     def closeEvent(self, e):
         """
         Reimplementation of closeEvent to logout the chat.
         """
         # self._controller.logout()
         QtGui.QMainWindow.closeEvent(self, e)
+
+    def _create_chat_store(self):
+        logger.debug('Soledad ready... creating ChatStore')
+        keymanager = self._window._keymanager
+        soledad = self._window._soledad
+
+        chat_store = ChatStore(keymanager, soledad)
+        self._controller.set_chat_store(chat_store)
 
 
 if __name__ == '__main__':

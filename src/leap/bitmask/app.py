@@ -222,7 +222,7 @@ def main():
         openvpn_verb=openvpn_verb,
         bypass_checks=bypass_checks)
 
-    chat = ChatWindow()
+    chat = ChatWindow(window)
     chat.show()
 
     sigint_window = partial(sigint_handler, window, logger=logger)
