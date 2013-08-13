@@ -29,7 +29,7 @@ from leap.bitmask.util.leap_log_handler import LeapLogHandler
 from leap.bitmask.util.streamtologger import StreamToLogger
 from leap.common.events import server as event_server
 
-from leap.services.chat.chatwindow import ChatWindow
+from leap.bitmask.services.chat.chatwindow import ChatWindow
 
 import codecs
 codecs.register(lambda name: codecs.lookup('utf-8')
