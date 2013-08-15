@@ -160,10 +160,18 @@ class Controller(QtCore.QObject):
 
     @QtCore.Slot(QtCore.QObject)
     def send_message(self, message):
+        logger.debug('Send message: {0}'.format(message))
         text = message.property('text')
 
         self._chat_client.send_message(self._user_to, text)
         self.new_message(self._user_from, text)
+
+        if self._chat_store is not None:
+            et = self._chat_store.encrypt_msg(
+                self._user_from, 'ivan@dev.bitmask.net', text)
+            logger.debug('Encrypted msg: {0}'.format(et))
+            dt = self._chat_store._decrypt_msg(et)
+            logger.debug('Decrypted msg: {0}'.format(dt))
 
         message.setProperty('text', '')
 
@@ -178,8 +186,8 @@ class Controller(QtCore.QObject):
 
         if self._chat_store is None:
             self._not_saved_msgs.append(msg)
-        else:
-            self._chat_store.save_chat(msg)
+        # else:
+        #     self._chat_store.save_chat(msg)
 
     def _load_history(self):
         chatlist = self._chat_store.chatlist

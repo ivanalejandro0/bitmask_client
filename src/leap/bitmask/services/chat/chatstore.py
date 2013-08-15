@@ -30,6 +30,8 @@ from twisted.internet.threads import deferToThread
 
 from leap.common.check import leap_assert, leap_assert_type
 from leap.soledad import Soledad
+from leap.keymanager.openpgp import OpenPGPKey
+from leap.keymanager.errors import KeyNotFound
 
 logger = logging.getLogger(__name__)
 
@@ -185,7 +187,40 @@ class ChatStore(QtCore.QObject):
         else:
             logger.debug('This does not look like a proper msg.')
 
-    def _decrypt_msg(self, doc, encdata):
+    def encrypt_msg(self, from_address, to_address, data):
+        """
+        Encrypt a message.
+
+        Fetch the recipient key and encrypt the content to the
+        recipient. If a key is not found, then the behaviour depends on the
+        configuration parameter ENCRYPTED_ONLY_KEY. If it is False, the message
+        is sent unencrypted and a warning is logged. If it is True, the
+        encryption fails with a KeyNotFound exception.
+
+        @raise KeyNotFound: Raised when the recipient key was not found and
+            the ENCRYPTED_ONLY_KEY configuration parameter is set to True.
+        """
+        logger.debug('encrypting msg')
+        # signkey = self._keymanager.get_key(
+        #     from_address, OpenPGPKey, private=True)
+        signkey = self._pkey
+        logger.debug("Will sign the message with %s." % signkey.fingerprint)
+        encdata = data
+        try:
+            # try to get the recipient pubkey
+            pubkey = self._keymanager.get_key(to_address, OpenPGPKey)
+            logger.debug("Will encrypt the message to %s" % pubkey.fingerprint)
+            encdata = self._keymanager.encrypt(data, pubkey, sign=signkey)
+        except KeyNotFound:
+            # at this point we _can_ send unencrypted mail, because if the
+            # configuration said the opposite the address would have been
+            # rejected in SMTPDelivery.validateTo().
+            # self._sign_payload_rec(self._message, signkey)
+            logger.debug('Will send unencrypted message to %s.' % to_address)
+
+        return encdata
+
+    def _decrypt_msg(self, encdata):
         logger.debug('decrypting msg')
         key = self._pkey
         decrdata = (self._keymanager.decrypt(
@@ -193,53 +228,4 @@ class ChatStore(QtCore.QObject):
             # XXX get from public method instead
             passphrase=self._soledad._passphrase))
 
-        # XXX TODO: defer this properly
-        return self._process_decrypted(doc, decrdata)
-
-    def _process_decrypted(self, doc, data):
-        """
-        Process a successfully decrypted message.
-
-        :param doc: a SoledadDocument instance containing the incoming message
-        :type doc: SoledadDocument
-
-        :param data: the json-encoded, decrypted content of the incoming
-                     message
-        :type data: str
-
-        :param inbox: a open SoledadMailbox instance where this message is
-                      to be saved
-        :type inbox: SoledadMailbox
-        """
-        logger.debug("processing incoming message!")
-        msg = json.loads(data)
-        if not isinstance(msg, dict):
-            return False
-        if not msg.get(self.INCOMING_KEY, False):
-            return False
-        # ok, this is an incoming message
-        rawmsg = msg.get(self.CONTENT_KEY, None)
-        if not rawmsg:
-            return False
-        logger.debug('got incoming message: %s' % (rawmsg,))
-
-        try:
-            pgp_beg = "-----BEGIN PGP MESSAGE-----"
-            pgp_end = "-----END PGP MESSAGE-----"
-            if pgp_beg in rawmsg:
-                first = rawmsg.find(pgp_beg)
-                last = rawmsg.rfind(pgp_end)
-                pgp_message = rawmsg[first:first + last]
-
-                decrdata = (self._keymanager.decrypt(
-                    pgp_message, self._pkey,
-                    # XXX get from public method instead
-                    passphrase=self._soledad._passphrase))
-                rawmsg = rawmsg.replace(pgp_message, decrdata)
-            # add to inbox and delete from soledad
-            self._inbox.addMessage(rawmsg, (self.RECENT_FLAG,))
-            doc_id = doc.doc_id
-            self._soledad.delete_doc(doc)
-            logger.debug("deleted doc %s from incoming" % doc_id)
-        except Exception as e:
-            logger.error("Problem processing incoming mail: %r" % (e,))
+        return decrdata
