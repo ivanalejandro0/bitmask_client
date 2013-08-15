@@ -220,8 +220,12 @@ class ChatStore(QtCore.QObject):
 
         return encdata
 
-    def _decrypt_msg(self, encdata):
-        logger.debug('decrypting msg')
+    def decrypt_msg(self, encdata):
+        logger.debug('Decrypting msg...')
+        if not self._is_encrypted(encdata):
+            logger.debug('Data is not encrypted.')
+            return encdata
+
         key = self._pkey
         decrdata = (self._keymanager.decrypt(
             encdata, key,
@@ -229,3 +233,16 @@ class ChatStore(QtCore.QObject):
             passphrase=self._soledad._passphrase))
 
         return decrdata
+
+    def _is_encrypted(self, data):
+        """
+        Returns whether a message is encrypted or not.
+
+        :param data: the json-encoded, possibly encrypted incoming message
+        :type data: str
+
+        :rtype: bool
+        """
+        pgp_beg = "-----BEGIN PGP MESSAGE-----"
+        pgp_end = "-----END PGP MESSAGE-----"
+        return pgp_beg in data and pgp_end in data

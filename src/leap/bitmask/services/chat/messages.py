@@ -166,20 +166,25 @@ class Controller(QtCore.QObject):
         logger.debug('Send message: {0}'.format(message))
         text = message.property('text')
 
-        self._chat_client.send_message(self._user_to, text)
-        self.new_message(self._user_from, text)
-
         if self._chat_store is not None:
             et = self._chat_store.encrypt_msg(
-                self._user_from, 'ivan@dev.bitmask.net', text)
+                self._user_from, self._bitmask_jid, text)
             logger.debug('Encrypted msg: {0}'.format(et))
-            dt = self._chat_store._decrypt_msg(et)
+            dt = self._chat_store.decrypt_msg(et)
             logger.debug('Decrypted msg: {0}'.format(dt))
+
+        # self._chat_client.send_message(self._user_to, text)
+        self._chat_client.send_message(self._user_to, et)
+        self.new_message(self._user_from, text)
 
         message.setProperty('text', '')
 
     def new_message(self, sender, message, store=True):
         logger.debug('new message')
+
+        if self._chat_store is not None:
+            message = self._chat_store._decrypt_msg(message)
+
         msg = Message(message, sender)
         msgw = MessageWrapper(msg)
         self._model.addItem(msgw)
