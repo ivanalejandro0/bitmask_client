@@ -18,12 +18,12 @@
 """
 Message abstraction classes, models and controller.
 """
+import logging
+
 from PySide import QtCore
 from chatclient import ChatClient
 
-from utils import get_log_handler
-
-logger = get_log_handler(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Message(object):

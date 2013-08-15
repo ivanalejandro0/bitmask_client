@@ -21,16 +21,15 @@ Main window for the chat service.
 import os
 import sys
 import signal
+import logging
 
 from PySide import QtCore, QtDeclarative, QtGui
 
 from messages import Controller, MessageListModel
 from messages import Message, MessageWrapper
-
-from utils import get_log_handler
 from chatstore import ChatStore
 
-logger = get_log_handler(__name__)
+logger = logging.getLogger(__name__)
 
 
 def get_demo_messages():

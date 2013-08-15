@@ -18,14 +18,15 @@
 """
 XMPP Chat class.
 """
+import logging
+
 from PySide import QtCore
 
 from twisted.words.protocols.jabber import client, jid, xmlstream
 from twisted.words.xish import domish
 
-from utils import get_log_handler
 
-logger = get_log_handler(__name__)
+logger = logging.getLogger(__name__)
 
 
 class ChatClient(QtCore.QObject):
