@@ -23,7 +23,7 @@ Rectangle {
       height: parent.height
       x: width
       onAcceptedChanged: {
-        controller.set_user_to(jid.text)
+        controller.set_user_to(jid.text, bitmask_jid.text)
         flickable.state = "CHAT"
       }
     }

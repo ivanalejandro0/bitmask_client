@@ -126,9 +126,12 @@ class Controller(QtCore.QObject):
     def logged_in(self):
         return self._logged_in
 
-    @QtCore.Slot(str)
-    def set_user_to(self, user_to):
+    @QtCore.Slot(str, str)
+    def set_user_to(self, user_to, bitmask_jid):
+        logger.debug("Starting communcation with: {0}, {1}".format(
+            user_to, bitmask_jid))
         self._user_to = user_to
+        self._bitmask_jid = bitmask_jid
 
     @QtCore.Slot(str, str, QtCore.QObject)
     def login(self, user, password, widget):
