@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>648</width>
-    <height>469</height>
+    <width>682</width>
+    <height>554</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,30 +18,7 @@
     <normaloff>:/images/mask-icon.png</normaloff>:/images/mask-icon.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Filter by:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLineEdit" name="leFilterBy"/>
-   </item>
-   <item row="2" column="2">
-    <widget class="QCheckBox" name="cbCaseInsensitive">
-     <property name="text">
-      <string>Case Insensitive</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="3">
-    <widget class="QTextBrowser" name="txtLogHistory"/>
-   </item>
-   <item row="0" column="0" colspan="3">
+   <item row="0" column="0" colspan="4">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="btnDebug">
@@ -151,6 +128,80 @@
        <property name="icon">
         <iconset resource="../../../../../data/resources/loggerwindow.qrc">
          <normaloff>:/images/oxygen-icons/document-save-as.png</normaloff>:/images/oxygen-icons/document-save-as.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0" colspan="4">
+    <widget class="QTextBrowser" name="txtLogHistory"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Filter by:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QLineEdit" name="leFilterBy"/>
+   </item>
+   <item row="2" column="3">
+    <widget class="QCheckBox" name="cbCaseInsensitive">
+     <property name="text">
+      <string>Case Insensitive</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="4">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnPreviousPage">
+       <property name="text">
+        <string>&lt;&lt; &amp;Previous page</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblLogsStatus">
+       <property name="text">
+        <string>Showing N of M logs. Page X of Y.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnNextPage">
+       <property name="text">
+        <string>&amp;Next page &gt;&gt;</string>
        </property>
       </widget>
      </item>
