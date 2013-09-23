@@ -76,7 +76,7 @@ cp -r $REPOS_ROOT/soledad/client/src/leap/soledad/client $LEAP_LIB/soledad
 cp -r $REPOS_ROOT/leap_mail/src/leap/mail $LEAP_LIB
 cp -r $REPOS_ROOT/keymanager/src/leap/keymanager $LEAP_LIB
 
-# copy bitmask launcher to the bundle template 
+# copy bitmask launcher to the bundle template
 # e.g. TEMPLATE_BUNDLE/Bitmask.app/Contents/MacOS/Bitmask
 cd $REPOS_ROOT/bitmask_launcher/build/
 make
