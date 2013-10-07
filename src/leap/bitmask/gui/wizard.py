@@ -55,6 +55,12 @@ class Wizard(QtGui.QWizard):
 
     BARE_USERNAME_REGEX = r"^[A-Za-z\d_]+$"
 
+    # thanks to: http://stackoverflow.com/a/3824105/687989
+    VALID_DOMAIN_REGEX = (
+        r"^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])"
+        r"(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$"
+    )
+
     def __init__(self, bypass_checks=False):
         """
         Constructor for the main Wizard.
@@ -124,6 +130,10 @@ class Wizard(QtGui.QWizard):
             self._register)
 
         self.ui.rbExistingProvider.toggled.connect(self._skip_provider_checks)
+
+        domain_re = QtCore.QRegExp(self.VALID_DOMAIN_REGEX)
+        self.ui.lnProvider.setValidator(
+            QtGui.QRegExpValidator(domain_re, self))
 
         usernameRe = QtCore.QRegExp(self.BARE_USERNAME_REGEX)
         self.ui.lblUser.setValidator(
