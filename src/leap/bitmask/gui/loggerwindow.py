@@ -78,8 +78,8 @@ class LoggerWindow(QtGui.QDialog):
         Adds a line to the history, only if it's in the desired levels to show.
 
         :param log: a log record to be inserted in the widget
-        :type log: a dict with RECORD_KEY and MESSAGE_KEY.
-            the record contains the LogRecord of the logging module,
+        :type log: a dict with LEVEL_KEY and MESSAGE_KEY.
+            the level number of the message,
             the message contains the formatted message for the log.
         """
         html_style = {
@@ -89,7 +89,7 @@ class LoggerWindow(QtGui.QDialog):
             logging.ERROR: "background: red; color: white;",
             logging.CRITICAL: "background: red; color: white; font: bold;"
         }
-        level = log[LeapLogHandler.RECORD_KEY].levelno
+        level = log[LeapLogHandler.LEVEL_KEY]
         message = log[LeapLogHandler.MESSAGE_KEY]
 
         if self._logs_to_display[level]:
