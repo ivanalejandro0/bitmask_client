@@ -29,7 +29,7 @@ class LogHandler(logging.Handler):
     """
 
     MESSAGE_KEY = 'message'
-    RECORD_KEY = 'record'
+    LEVEL_KEY = 'levelno'
 
     def __init__(self, qtsignal):
         """
@@ -70,7 +70,7 @@ class LogHandler(logging.Handler):
         """
         self.setFormatter(self._get_format(logRecord.levelname))
         log = self.format(logRecord)
-        log_item = {self.RECORD_KEY: logRecord, self.MESSAGE_KEY: log}
+        log_item = {self.LEVEL_KEY: logRecord.levelno, self.MESSAGE_KEY: log}
         self._log_history.append(log_item)
         self._qtsignal(log_item)
 
@@ -83,7 +83,7 @@ class HandlerAdapter(object):
     that surfaced under OSX with pyside 1.1.0.
     """
     MESSAGE_KEY = 'message'
-    RECORD_KEY = 'record'
+    LEVEL_KEY = 'levelno'
 
     def __init__(self, qtsignal):
         self._handler = LogHandler(qtsignal=qtsignal)
@@ -110,7 +110,7 @@ class LeapLogHandler(QtCore.QObject, HandlerAdapter):
     having been connected to a gui.
     """
     # All dicts returned are of the form
-    # {'record': LogRecord, 'message': str}
+    # {'levelno': LogRecord.levelno, 'message': str}
     new_log = QtCore.Signal(dict)
 
     def __init__(self):

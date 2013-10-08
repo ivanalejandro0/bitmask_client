@@ -69,19 +69,6 @@ class LeapLogHandlerTest(BaseLeapTest, BasicPySlotCase):
         self.logger.debug('test')
         self.assertEqual(len(self.leap_handler.log_history), 1)
 
-    def test_history_records_order(self):
-        self.logger.debug('test 01')
-        self.logger.debug('test 02')
-        self.logger.debug('test 03')
-
-        logs = []
-        for message in self.leap_handler.log_history:
-            logs.append(message[LeapLogHandler.RECORD_KEY].msg)
-
-        self.assertIn('test 01', logs)
-        self.assertIn('test 02', logs)
-        self.assertIn('test 03', logs)
-
     def test_history_messages_order(self):
         self.logger.debug('test 01')
         self.logger.debug('test 02')
