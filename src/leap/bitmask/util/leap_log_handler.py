@@ -21,6 +21,8 @@ import logging
 
 from PySide import QtCore
 
+from leap.bitmask.util.logsmodel import LogsModel
+
 
 class LogHandler(logging.Handler):
     """
@@ -39,7 +41,7 @@ class LogHandler(logging.Handler):
         """
         # TODO This is going to eat lots of memory after some time.
         # Should be pruned at some moment.
-        self._log_history = []
+        self._log_history = LogsModel()
 
         logging.Handler.__init__(self)
         self._qtsignal = qtsignal
@@ -71,7 +73,7 @@ class LogHandler(logging.Handler):
         self.setFormatter(self._get_format(logRecord.levelname))
         log = self.format(logRecord)
         log_item = {self.LEVEL_KEY: logRecord.levelno, self.MESSAGE_KEY: log}
-        self._log_history.append(log_item)
+        self._log_history.save_item(log_item)
         self._qtsignal(log_item)
 
 

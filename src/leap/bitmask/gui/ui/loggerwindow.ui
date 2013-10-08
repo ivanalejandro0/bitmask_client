@@ -18,7 +18,10 @@
     <normaloff>:/images/mask-icon.png</normaloff>:/images/mask-icon.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="4">
+   <item row="3" column="0" colspan="5">
+    <widget class="QTextBrowser" name="txtLogHistory"/>
+   </item>
+   <item row="0" column="0" colspan="5">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="btnDebug">
@@ -133,31 +136,19 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0" colspan="4">
-    <widget class="QTextBrowser" name="txtLogHistory"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Filter by:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QLineEdit" name="leFilterBy"/>
-   </item>
-   <item row="2" column="3">
-    <widget class="QCheckBox" name="cbCaseInsensitive">
-     <property name="text">
-      <string>Case Insensitive</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="4">
+   <item row="4" column="0" colspan="5">
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnFirstPage">
+       <property name="text">
+        <string>F&amp;irst</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../data/resources/loggerwindow.qrc">
+         <normaloff>:/images/oxygen-icons/Actions-go-first-view-icon.png</normaloff>:/images/oxygen-icons/Actions-go-first-view-icon.png</iconset>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QPushButton" name="btnPreviousPage">
        <property name="text">
@@ -200,6 +191,26 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnNextPage">
+       <property name="layoutDirection">
+        <enum>Qt::RightToLeft</enum>
+       </property>
+       <property name="text">
+        <string>&amp;Next</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../data/resources/loggerwindow.qrc">
+         <normaloff>:/images/oxygen-icons/Actions-go-next-view-icon.png</normaloff>:/images/oxygen-icons/Actions-go-next-view-icon.png</iconset>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnLastPage">
+       <property name="layoutDirection">
+        <enum>Qt::RightToLeft</enum>
+       </property>
        <property name="text">
         <string>&amp;Next page &gt;&gt;</string>
        </property>
@@ -207,16 +218,42 @@
      </item>
     </layout>
    </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>&amp;Filter by:</string>
+     </property>
+     <property name="buddy">
+      <cstring>leFilterBy</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QLineEdit" name="leFilterBy"/>
+   </item>
+   <item row="2" column="3">
+    <widget class="QPushButton" name="btnSearch">
+     <property name="text">
+      <string>&amp;Search</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>leFilterBy</tabstop>
+  <tabstop>btnSearch</tabstop>
+  <tabstop>txtLogHistory</tabstop>
+  <tabstop>btnFirstPage</tabstop>
+  <tabstop>btnPreviousPage</tabstop>
+  <tabstop>btnNextPage</tabstop>
+  <tabstop>btnLastPage</tabstop>
   <tabstop>btnDebug</tabstop>
   <tabstop>btnInfo</tabstop>
   <tabstop>btnWarning</tabstop>
   <tabstop>btnError</tabstop>
   <tabstop>btnCritical</tabstop>
   <tabstop>btnSave</tabstop>
-  <tabstop>txtLogHistory</tabstop>
  </tabstops>
  <resources>
   <include location="../../../../../data/resources/loggerwindow.qrc"/>
