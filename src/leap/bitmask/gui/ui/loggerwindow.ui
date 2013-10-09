@@ -152,7 +152,11 @@
      <item>
       <widget class="QPushButton" name="btnPreviousPage">
        <property name="text">
-        <string>&lt;&lt; &amp;Previous page</string>
+        <string>&amp;Previous</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../data/resources/loggerwindow.qrc">
+         <normaloff>:/images/oxygen-icons/Actions-go-previous-view-icon.png</normaloff>:/images/oxygen-icons/Actions-go-previous-view-icon.png</iconset>
        </property>
       </widget>
      </item>
@@ -212,7 +216,11 @@
         <enum>Qt::RightToLeft</enum>
        </property>
        <property name="text">
-        <string>&amp;Next page &gt;&gt;</string>
+        <string>&amp;Last</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../data/resources/loggerwindow.qrc">
+         <normaloff>:/images/oxygen-icons/Actions-go-last-view-icon.png</normaloff>:/images/oxygen-icons/Actions-go-last-view-icon.png</iconset>
        </property>
       </widget>
      </item>

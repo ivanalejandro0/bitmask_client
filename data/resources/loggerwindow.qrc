@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="/">
+    <file>../images/oxygen-icons/Actions-go-last-view-icon.png</file>
+    <file>../images/oxygen-icons/Actions-go-next-view-icon.png</file>
+    <file>../images/oxygen-icons/Actions-go-previous-view-icon.png</file>
+    <file>../images/oxygen-icons/Actions-go-first-view-icon.png</file>
     <file>../images/oxygen-icons/edit-bomb.png</file>
     <file>../images/oxygen-icons/document-save-as.png</file>
     <file>../images/oxygen-icons/dialog-information.png</file>
