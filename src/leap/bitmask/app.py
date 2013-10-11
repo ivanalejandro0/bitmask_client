@@ -72,10 +72,9 @@ def sigint_handler(*args, **kwargs):
     mainwindow.quit()
 
 
-def install_qtreactor(logger):
+def install_qtreactor():
     import qt4reactor
     qt4reactor.install()
-    logger.debug("Qt4 reactor installed")
 
 
 def add_logger_handlers(debug=False, logfile=None):
@@ -180,9 +179,6 @@ def main():
     flags.STANDALONE = standalone
     BaseConfig.standalone = standalone
 
-    logger = add_logger_handlers(debug, logfile)
-    replace_stdout_stderr_with_logging(logger)
-
     # And then we import all the other stuff
     from leap.bitmask.gui import locale_rc
     from leap.bitmask.gui import twisted_main
@@ -196,18 +192,10 @@ def main():
 
     if not we_are_the_one_and_only():
         # Bitmask is already running
-        logger.warning("Tried to launch more than one instance "
-                       "of Bitmask. Raising the existing "
-                       "one instead.")
+        # logger.warning("Tried to launch more than one instance "
+        #                "of Bitmask. Raising the existing "
+        #                "one instead.")
         sys.exit(1)
-
-    check_requirements()
-
-    logger.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    logger.info('Bitmask version %s', VERSION)
-    logger.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-
-    logger.info('Starting app')
 
     # We force the style if on KDE so that it doesn't load all the kde
     # libs, which causes a compatibility issue in some systems.
@@ -219,7 +207,18 @@ def main():
     app = QtGui.QApplication(sys.argv)
 
     # install the qt4reactor.
-    install_qtreactor(logger)
+    install_qtreactor()
+
+    logger = add_logger_handlers(debug, logfile)
+    replace_stdout_stderr_with_logging(logger)
+
+    check_requirements()
+
+    logger.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    logger.info('Bitmask version %s', VERSION)
+    logger.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+
+    logger.info('Starting app')
 
     # To test:
     # $ LANG=es ./app.py
