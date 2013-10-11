@@ -19,10 +19,7 @@ Custom handler for the logger window.
 """
 import logging
 
-from functools import partial
-
 from PySide import QtCore
-from twisted.internet import threads
 
 from leap.bitmask.util.logsmodel import LogsModel
 
@@ -77,10 +74,7 @@ class LogHandler(logging.Handler):
         log = self.format(logRecord)
         log_item = {self.LEVEL_KEY: logRecord.levelno, self.MESSAGE_KEY: log}
 
-        # self._log_history.save_item(log_item)
-        save_item = partial(self._log_history.save_item, log_item)
-        threads.deferToThread(save_item)
-
+        self._log_history.save_item(log_item)
         self._qtsignal(log_item)
 
 

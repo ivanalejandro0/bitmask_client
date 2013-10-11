@@ -65,7 +65,7 @@ class LoggerWindow(QtGui.QDialog):
         self.ui.btnLastPage.clicked.connect(self._last_page)
 
         # Initialize filters
-        self._message_filter = None
+        self._message_filter = ""
         self._levels_filter = None
 
         # Load logging history and connect logger with the widget
