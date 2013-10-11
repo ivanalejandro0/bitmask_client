@@ -1266,12 +1266,6 @@ class MainWindow(QtGui.QMainWindow):
         self._eip_status.eip_pre_up()
         self.user_stopped_eip = False
 
-        # until we set an option in the preferences window,
-        # we'll assume that by default we try to autostart.
-        # If we switch it off manually, it won't try the next
-        # time.
-        self._settings.set_autostart_eip(True)
-
         loaded = eipconfig.load_eipconfig_if_needed(
             provider_config, self._eip_config, provider)
 
@@ -1372,9 +1366,6 @@ class MainWindow(QtGui.QMainWindow):
 
         self._set_eipstatus_off(False)
         self._already_started_eip = False
-
-        logger.debug('Setting autostart to: False')
-        self._settings.set_autostart_eip(False)
 
         if self._logged_user:
             self._eip_status.set_provider(

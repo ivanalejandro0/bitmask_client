@@ -1,0 +1,1 @@
+  o Do not implicitly set the autostart EIP option. Closes #4132.
