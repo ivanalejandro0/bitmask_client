@@ -21,7 +21,7 @@ import logging
 
 from PySide import QtCore
 
-from leap.bitmask.util.logsmodel import LogsModel
+from leap.bitmask.util.logsmodellist import LogsModel
 
 
 class LogHandler(logging.Handler):
