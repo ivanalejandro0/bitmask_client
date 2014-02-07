@@ -322,5 +322,48 @@ def main():
     # Run main loop
     twisted_main.start(app)
 
+
+def save_yappi_reports():
+    yfs = yappi.get_func_stats()
+    fname = '/tmp/bitmask.func_stats.print_all.yappi'
+    with open(fname, 'w') as f:
+        f.write('Print all ->\n')
+        yfs.print_all(f)
+        f.write('\nRepr data all ->\n')
+        # yfs.print_all() is no detailed enough
+        for s in yfs:
+            f.write("%r\n" % (s, ))
+    print "yappi.get_func_stats.print_all saved to: %s" % (fname)
+
+    fname = '/tmp/bitmask.func_stats.debug_print.yappi'
+    _stdout = sys.stdout
+    with open(fname, 'w') as sys.stdout:
+        # debug_print only works with stdout, so I override it
+        yfs.debug_print()
+    sys.stdout = _stdout
+    print "yappi.get_func_stats.debug_print saved to: %s" % (fname)
+
+    fname = '/tmp/bitmask.thread_stats.yappi'
+    yts = yappi.get_thread_stats()
+    with open(fname, 'w') as f:
+        f.write('Print all ->\n')
+        yts.print_all(f)
+        f.write('\nRepr data all ->\n')
+        # yts.print_all() is no detailed enough
+        for s in yts:
+            f.write("%r\n" % (s, ))
+    print "yappi.get_thread_stats saved to: %s" % (fname)
+
+
 if __name__ == "__main__":
-    main()
+    PROFILE_THREADS = os.environ.get("LEAP_TPROFILE")
+    if PROFILE_THREADS:
+        try:
+            import yappi
+            yappi.start(True)
+            main()
+        finally:
+            yappi.stop()
+            save_yappi_reports()
+    else:
+        main()
