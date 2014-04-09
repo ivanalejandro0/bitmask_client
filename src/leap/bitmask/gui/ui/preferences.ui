@@ -117,7 +117,7 @@
    <item row="3" column="0">
     <widget class="QGroupBox" name="gbEnabledServices">
      <property name="title">
-      <string>Enabled services</string>
+      <string>Enabled services (logout/login required)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="3" column="1">

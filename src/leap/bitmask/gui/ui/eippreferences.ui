@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>144</height>
+    <height>159</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
       <bool>true</bool>
      </property>
      <property name="title">
-      <string>Select gateway for provider</string>
+      <string>Select gateway for provider (logout/login required)</string>
      </property>
      <property name="checkable">
       <bool>false</bool>

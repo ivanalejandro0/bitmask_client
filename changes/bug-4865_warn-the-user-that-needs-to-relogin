@@ -1,0 +1,1 @@
+- Warn the user that needs to login/logout to apply the changes in enabled services and eip. Closes #4865.
