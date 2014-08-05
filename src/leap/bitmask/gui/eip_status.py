@@ -334,7 +334,7 @@ class EIPStatusWidget(QtGui.QWidget):
         Triggered after a successful login.
         Enables the start button.
         """
-        # logger.debug('Showing EIP start button')
+        logger.debug('Showing EIP start button')
         self.eip_button.show()
         self.hide_eip_cancel_button()
 

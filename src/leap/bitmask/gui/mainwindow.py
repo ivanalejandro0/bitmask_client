@@ -663,6 +663,8 @@ class MainWindow(QtGui.QMainWindow):
         to do so, start it. Otherwise it leaves everything in place
         for the user to click Turn ON.
         """
+        logger.debug("E"*100)
+        logger.debug('Can start EIP')
         settings = self._settings
         default_provider = settings.get_defaultprovider()
         enabled_services = []
@@ -695,6 +697,8 @@ class MainWindow(QtGui.QMainWindow):
         If EIP can't be started right away, get the UI to what it
         needs to look like and waits for a proper login/eip bootstrap.
         """
+        logger.debug("E"*100)
+        logger.debug('Cannot start EIP')
         settings = self._settings
         default_provider = settings.get_defaultprovider()
         enabled_services = []
