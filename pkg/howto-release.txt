@@ -1,0 +1,106 @@
+New release checklist (for bitmask_client)
+==========================================
+
+We should tag everything (that needs tagging) after the client. the suggested order is:
+- leap.common
+- leap.keymanager
+- leap.soledad
+- leap.mail
+- leap.bitmask
+- leap.mx
+
+repo branches:
+- master: the stable release tags are merged in here.
+- develop: the latest code is here.
+- release/0.7.x: branch meant as preparation 'place' for 0.7.x release
+- release/0.8.x: branch meant as preparation 'place' for 0.8.x release
+
+# example release version
+RELEASE=0.7.1
+
+branch work to do:
+- get the branch `release/0.7.x` at the right point that we want to tag. (pull, checkout)
+- git checkout -b release/$RELEASE
+- (maybe) cherry-pick specific commits
+- (maybe) add special fixes for this release
+  note: the release branch is created when the first release candidate is
+  tagged, after that the bugfixes and features that are meant to be shipped with
+  the specific version that we are targetting are merged in that branch
+
+Changes to be made or things to take care of:
+- Check that the version in bitmask_client/pkg/linux/bitmask-root is bumped if needed.
+    FIX: shouldn't this be bumped when that file is changed?
+
+- Update relnotes.txt (if needed).
+- Review pkg/requirements.pip for everything and update if needed (that's why the tag order).
+    - See whatever has been introduced in changes/VERSION_COMPAT
+    - Reset changes/VERSION_COMPAT
+    - git commit -am "Update requirements file."
+
+- Fold in changes files into the CHANGELOG
+    - NOTE: For leap.soledad, the CHANGELOG entries should be divided per
+      package (common, client, server). See older releases for reference.
+    - Helper bash line: for i in $(ls changes); do cat changes/$i; echo; done
+    - git rm changes/feature*; git rm changes/bug*
+    - git commit -am "Fold in changes."
+
+- git tag --sign $RELEASE -m "Tag leap.bitmask version $RELEASE"
+
+# If everything went ok, push the changes!
+- git push origin release/0.7.x
+- git push origin $RELEASE  # push the tag
+
+Note: we could create a bundle with a local (local to the bundler) tag and if
+it works correctly then push the tag to the remote.
+
+Bundling
+--------
+
+Internal RC:
+    for internal testing
+    release candidate
+    no TUF repo
+    no public announcement
+
+Public RC:
+    for public testing
+    release candidate
+    using the 'unstable' TUF repo
+    public announcement
+
+Stable:
+    for public consumption
+    final version
+    using the 'stable' TUF repo
+    public announcement
+
+
+- Build standalone bundle
+    - see https://github.com/leapcode/bitmask_bundler/blob/develop/createbundle.sh
+- Sign the bundles
+    - `gpg --armor --sign --detach-sign <path/to/bundle>`
+- Upload bundles and signatures to staging@salmon, ping micah
+- Update '-latest' symlinks after micah move the bundles.
+    - there is a script in salmon called `update-bitmask-symlinks.sh`
+
+- for [Public RC | Stable] Generate updated TUF repo
+    - see https://github.com/leapcode/bitmask_bundler/blob/develop/tuf-stuff.sh
+
+- Internal RC bundle: NO TUF
+- Public RC bundle:
+    - see https://we.riseup.net/leap+client/tuf-unstable
+    - work in progress: https://github.com/ivanalejandro0/bitmask_bundler/blob/feature/tuf-repo-updater/fabfile.py
+- Stable bundle:
+    - upload updated TUF repo @salmon and ping kwadronaut
+
+
+Debian packages
+---------------
+
+TODO: complete this
+
+
+Python packages (PyPI)
+----------------------
+
+TODO: complete this
