@@ -24,12 +24,12 @@ import stat
 
 import zmq.auth
 
-from leap.bitmask.util import get_path_prefix
+from leap.bitmask.util import get_bitmask_config_path
 from leap.common.files import mkdir_p
 
 logger = logging.getLogger(__name__)
 
-KEYS_DIR = os.path.join(get_path_prefix(), 'leap', 'zmq_certificates')
+KEYS_DIR = os.path.join(get_bitmask_config_path(), 'zmq_certificates')
 
 
 def generate_zmq_certificates():

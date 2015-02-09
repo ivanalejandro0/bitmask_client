@@ -23,7 +23,7 @@ import logging
 from PySide import QtCore
 
 from leap.common.check import leap_assert, leap_assert_type
-from leap.bitmask.util import get_path_prefix
+from leap.bitmask.util import get_bitmask_config_path
 
 logger = logging.getLogger(__name__)
 
@@ -75,8 +75,8 @@ class LeapSettings(object):
     GATEWAY_AUTOMATIC = "Automatic"
 
     def __init__(self):
-        settings_path = os.path.join(get_path_prefix(),
-                                     "leap", self.CONFIG_NAME)
+        settings_path = os.path.join(get_bitmask_config_path(),
+                                     self.CONFIG_NAME)
 
         self._settings = QtCore.QSettings(settings_path,
                                           QtCore.QSettings.IniFormat)
@@ -128,8 +128,8 @@ class LeapSettings(object):
         # other things, not just the directories
         providers = []
         try:
-            providers_path = os.path.join(get_path_prefix(),
-                                          "leap", "providers")
+            providers_path = os.path.join(get_bitmask_config_path(),
+                                          "providers")
             providers = os.listdir(providers_path)
         except Exception as e:
             logger.debug("Error listing providers, assume there are none. %r"

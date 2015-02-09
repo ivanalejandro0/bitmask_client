@@ -21,7 +21,7 @@ import logging
 import os
 import re
 
-from leap.bitmask.util import get_path_prefix
+from leap.bitmask.util import get_bitmask_config_path
 
 
 class SelectiveSilencerFilter(logging.Filter):
@@ -29,7 +29,7 @@ class SelectiveSilencerFilter(logging.Filter):
     Configurable filter for root leap logger.
 
     If you want to ignore components from the logging, just add them,
-    one by line, to ~/.config/leap/leap.dev.conf
+    one by line, to the file 'get_bitmask_config_path()' + '/leap.dev.conf'
     """
     # TODO we can augment this by properly parsing the log-silencer file
     # and having different sections: ignore, levels, ...
@@ -65,7 +65,7 @@ class SelectiveSilencerFilter(logging.Filter):
         """
         The configuration file for custom ignore rules.
         """
-        return os.path.join(get_path_prefix(), "leap", self.CONFIG_NAME)
+        return os.path.join(get_bitmask_config_path(), self.CONFIG_NAME)
 
     def _load_rules(self):
         """

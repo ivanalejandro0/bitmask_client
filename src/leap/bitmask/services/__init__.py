@@ -28,7 +28,7 @@ from leap.bitmask.crypto.srpauth import SRPAuth
 from leap.bitmask.util.constants import REQUEST_TIMEOUT
 from leap.bitmask.util.privilege_policies import is_missing_policy_permissions
 from leap.bitmask.util.request_helpers import get_content
-from leap.bitmask import util
+from leap.bitmask.util import get_bitmask_config_path
 
 from leap.common.check import leap_assert
 from leap.common.config.baseconfig import BaseConfig
@@ -108,10 +108,8 @@ def download_service_config(provider_config, service_config,
     service_name = service_config.name
     service_json = "{0}-service.json".format(service_name)
     headers = {}
-    mtime = get_mtime(os.path.join(util.get_path_prefix(),
-                                   "leap", "providers",
-                                   provider_config.get_domain(),
-                                   service_json))
+    mtime = get_mtime(os.path.join(get_bitmask_config_path(), "providers",
+                                   provider_config.get_domain(), service_json))
 
     if download_if_needed and mtime:
         headers['if-modified-since'] = mtime

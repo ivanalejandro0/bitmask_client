@@ -21,7 +21,7 @@ import ConfigParser
 import logging
 import os
 
-from leap.bitmask.util import get_path_prefix
+from leap.bitmask.util import get_bitmask_config_path
 from leap.common.check import leap_assert, leap_assert_type
 
 logger = logging.getLogger(__name__)
@@ -44,8 +44,8 @@ class Settings(object):
         """
         Create the ConfigParser object and read it.
         """
-        self._settings_path = os.path.join(get_path_prefix(),
-                                           "leap", self.CONFIG_NAME)
+        self._settings_path = os.path.join(get_bitmask_config_path(),
+                                           self.CONFIG_NAME)
 
         self._settings = ConfigParser.ConfigParser()
         self._settings.read(self._settings_path)

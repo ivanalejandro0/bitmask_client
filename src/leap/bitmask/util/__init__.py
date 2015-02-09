@@ -59,6 +59,10 @@ def get_path_prefix():
     return common_get_path_prefix(flags.STANDALONE)
 
 
+def get_bitmask_config_path():
+    return os.path.join(common_get_path_prefix(flags.STANDALONE), 'bitmask')
+
+
 def get_modification_ts(path):
     """
     Gets modification time of a file.

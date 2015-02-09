@@ -25,7 +25,7 @@ from leap.bitmask import provider
 from leap.bitmask.config import flags
 from leap.bitmask.config.provider_spec import leap_provider_spec
 from leap.bitmask.services import get_service_display_name
-from leap.bitmask.util import get_path_prefix
+from leap.bitmask.util import get_bitmask_config_path
 from leap.common.check import leap_check
 from leap.common.config.baseconfig import BaseConfig, LocalizedKey
 
@@ -192,7 +192,7 @@ class ProviderConfig(BaseConfig):
         :rtype: unicode
         """
 
-        cert_path = os.path.join(get_path_prefix(), "leap", "providers",
+        cert_path = os.path.join(get_bitmask_config_path(), "providers",
                                  self.get_domain(), "keys", "ca", "cacert.pem")
 
         if not about_to_download:

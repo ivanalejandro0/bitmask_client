@@ -37,8 +37,8 @@ from leap.bitmask.crypto.srpauth import SRPAuth
 from leap.bitmask.services import download_service_config
 from leap.bitmask.services.abstractbootstrapper import AbstractBootstrapper
 from leap.bitmask.services.soledad.soledadconfig import SoledadConfig
+from leap.bitmask.util import get_bitmask_config_path, get_path_prefix
 from leap.bitmask.util import first, is_file, is_empty_file, make_address
-from leap.bitmask.util import get_path_prefix
 from leap.bitmask.platform_init import IS_WIN
 from leap.common.check import leap_assert, leap_assert_type, leap_check
 from leap.common.files import which
@@ -106,7 +106,7 @@ def get_db_paths(uuid):
     :return: a tuple with secrets, local_db paths
     :rtype: tuple
     """
-    prefix = os.path.join(get_path_prefix(), "leap", "soledad")
+    prefix = os.path.join(get_bitmask_config_path(), "soledad")
     secrets = "%s/%s.secret" % (prefix, uuid)
     local_db = "%s/%s.db" % (prefix, uuid)
 

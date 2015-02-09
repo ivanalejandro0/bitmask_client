@@ -28,7 +28,7 @@ from leap.bitmask.config import flags
 from leap.bitmask.config.providerconfig import ProviderConfig
 from leap.bitmask.services import ServiceConfig
 from leap.bitmask.services.eip.eipspec import get_schema
-from leap.bitmask.util import get_path_prefix
+from leap.bitmask.util import get_bitmask_config_path
 from leap.common.check import leap_assert, leap_assert_type
 
 logger = logging.getLogger(__name__)
@@ -47,10 +47,10 @@ def get_eipconfig_path(domain, relative=True):
     """
     leap_assert(domain is not None, "get_eipconfig_path: We need a domain")
 
-    path = os.path.join("leap", "providers", domain, "eip-service.json")
+    path = os.path.join("providers", domain, "eip-service.json")
 
     if not relative:
-        path = os.path.join(get_path_prefix(), path)
+        path = os.path.join(get_bitmask_config_path(), path)
 
     return path
 
@@ -312,8 +312,7 @@ class EIPConfig(ServiceConfig):
         leap_assert(providerconfig, "We need a provider")
         leap_assert_type(providerconfig, ProviderConfig)
 
-        cert_path = os.path.join(get_path_prefix(),
-                                 "leap", "providers",
+        cert_path = os.path.join(get_bitmask_config_path(), "providers",
                                  providerconfig.get_domain(),
                                  "keys", "client", "openvpn.pem")
 

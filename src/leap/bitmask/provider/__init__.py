@@ -39,7 +39,7 @@ def get_provider_path(domain):
     :rtype: str
     """
     leap_assert(domain is not None, "get_provider_path: We need a domain")
-    return os.path.join("leap", "providers", domain, "provider.json")
+    return os.path.join("bitmask", "providers", domain, "provider.json")
 
 
 def supports_api(api_version):

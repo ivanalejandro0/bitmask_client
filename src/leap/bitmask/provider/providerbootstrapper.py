@@ -25,12 +25,12 @@ import sys
 import requests
 
 from leap.bitmask import provider
-from leap.bitmask import util
 from leap.bitmask.config import flags
 from leap.bitmask.config.providerconfig import ProviderConfig, MissingCACert
 from leap.bitmask.provider import get_provider_path
 from leap.bitmask.provider.pinned import PinnedProviders
 from leap.bitmask.services.abstractbootstrapper import AbstractBootstrapper
+from leap.bitmask.util import get_path_prefix
 from leap.bitmask.util.constants import REQUEST_TIMEOUT
 from leap.bitmask.util.request_helpers import get_content
 from leap.common import ca_bundle
@@ -147,11 +147,11 @@ class ProviderBootstrapper(AbstractBootstrapper):
             res = self._session.get(uri, verify=verify,
                                     timeout=REQUEST_TIMEOUT)
             res.raise_for_status()
-        except requests.exceptions.SSLError as exc:
+        except requests.exceptions.SSLError:
             self._err_msg = self.tr("Provider certificate could "
                                     "not be verified")
             raise
-        except Exception as exc:
+        except Exception:
             # XXX careful!. The error might be also a SSL handshake
             # timeout error, in which case we should retry a couple of times
             # more, for cases where the ssl server gives high latencies.
@@ -172,7 +172,7 @@ class ProviderBootstrapper(AbstractBootstrapper):
 
         headers = {}
         domain = self._domain.encode(sys.getfilesystemencoding())
-        provider_json = os.path.join(util.get_path_prefix(),
+        provider_json = os.path.join(get_path_prefix(),
                                      get_provider_path(domain))
 
         if domain in PinnedProviders.domains() and \
