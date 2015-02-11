@@ -150,7 +150,7 @@ def download_service_config(provider_config, service_config,
     service_config.set_api_version(api_version)
 
     # Not modified
-    service_path = ("leap", "providers", provider_config.get_domain(),
+    service_path = ("bitmask", "providers", provider_config.get_domain(),
                     service_json)
     if res.status_code == 304:
         logger.debug(

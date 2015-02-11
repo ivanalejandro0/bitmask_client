@@ -48,6 +48,16 @@ from leap.common.testing.basetest import BaseLeapTest
 from leap.common.testing.https_server import where
 
 
+def mkdtemp():
+    """
+    Custom mkdtemp method that uses a custom subdirectory for the leap tests.
+    """
+    sys_temp = tempfile.gettempdir()
+    leap_temp = os.path.join(sys_temp, 'leap-tests')
+    mkdir_p(leap_temp)
+    return tempfile.mkdtemp(dir=leap_temp)
+
+
 class ProviderBootstrapperTest(BaseLeapTest):
     def setUp(self):
         self.pb = ProviderBootstrapper()
@@ -128,8 +138,7 @@ class ProviderBootstrapperTest(BaseLeapTest):
         """
         old_content = "NOT THE NEW CERT"
         new_content = "NEW CERT"
-        new_cert_path = os.path.join(tempfile.mkdtemp(),
-                                     "mynewcert.pem")
+        new_cert_path = os.path.join(mkdtemp(), "mynewcert.pem")
 
         with open(new_cert_path, "w") as c:
             c.write(old_content)
@@ -259,8 +268,7 @@ yV8e
         self.pb._domain = "somedomain"
 
     def test_check_ca_fingerprint_checksout(self):
-        cert_path = os.path.join(tempfile.mkdtemp(),
-                                 "mynewcert.pem")
+        cert_path = os.path.join(mkdtemp(), "mynewcert.pem")
 
         with open(cert_path, "w") as c:
             c.write(self.KNOWN_GOOD_CERT)
@@ -274,8 +282,7 @@ yV8e
         os.unlink(cert_path)
 
     def test_check_ca_fingerprint_fails(self):
-        cert_path = os.path.join(tempfile.mkdtemp(),
-                                 "mynewcert.pem")
+        cert_path = os.path.join(mkdtemp(), "mynewcert.pem")
 
         with open(cert_path, "w") as c:
             c.write(self.KNOWN_GOOD_CERT)
@@ -316,7 +323,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         # tearDown so we are sure everything is as expected for each
         # test. If we do it inside each specific test, a failure in
         # the test will leave the implementation with the mock.
-        self.old_gpp = util.get_path_prefix
+        self.old_gpp = util.get_bitmask_config_path
 
         self.old_load = ProviderConfig.load
         self.old_save = ProviderConfig.save
@@ -324,7 +331,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         self.old_api_uri = ProviderConfig.get_api_uri
 
     def tearDown(self):
-        util.get_path_prefix = self.old_gpp
+        util.get_bitmask_config_path = self.old_gpp
         ProviderConfig.load = self.old_load
         ProviderConfig.save = self.old_save
         ProviderConfig.get_api_version = self.old_api_version
@@ -376,7 +383,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
                             paths
         :type path_prefix: str
         """
-        util.get_path_prefix = mock.MagicMock(return_value=path_prefix)
+        util.get_bitmask_config_path = mock.MagicMock(return_value=path_prefix)
         ProviderConfig.get_api_version = mock.MagicMock(
             return_value=api)
         ProviderConfig.get_api_uri = mock.MagicMock(
@@ -405,9 +412,8 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         :returns: the provider.json path used
         :rtype: str
         """
-        provider_dir = os.path.join(util.get_path_prefix(),
-                                    "leap", "providers",
-                                    self.pb._domain)
+        provider_dir = os.path.join(util.get_bitmask_config_path(),
+                                    "providers", self.pb._domain)
         mkdir_p(provider_dir)
         provider_path = os.path.join(provider_dir,
                                      "provider.json")
@@ -420,7 +426,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         'leap.bitmask.config.providerconfig.ProviderConfig.get_domain',
         lambda x: where('testdomain.com'))
     def test_download_provider_info_new_provider(self):
-        self._setup_provider_config_with("1", tempfile.mkdtemp())
+        self._setup_provider_config_with("1", mkdtemp())
         self._setup_providerbootstrapper(True)
 
         self.pb._download_provider_info()
@@ -430,7 +436,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         'leap.bitmask.config.providerconfig.ProviderConfig.get_ca_cert_path',
         lambda x: where('cacert.pem'))
     def test_download_provider_info_not_modified(self):
-        self._setup_provider_config_with("1", tempfile.mkdtemp())
+        self._setup_provider_config_with("1", mkdtemp())
         self._setup_providerbootstrapper(True)
         provider_path = self._produce_dummy_provider_json()
 
@@ -446,7 +452,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         'leap.bitmask.config.providerconfig.ProviderConfig.get_domain',
         lambda x: where('testdomain.com'))
     def test_download_provider_info_not_modified_and_no_cacert(self):
-        self._setup_provider_config_with("1", tempfile.mkdtemp())
+        self._setup_provider_config_with("1", mkdtemp())
         self._setup_providerbootstrapper(True)
         provider_path = self._produce_dummy_provider_json()
 
@@ -462,7 +468,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         'leap.bitmask.config.providerconfig.ProviderConfig.get_ca_cert_path',
         lambda x: where('cacert.pem'))
     def test_download_provider_info_modified(self):
-        self._setup_provider_config_with("1", tempfile.mkdtemp())
+        self._setup_provider_config_with("1", mkdtemp())
         self._setup_providerbootstrapper(True)
         provider_path = self._produce_dummy_provider_json()
 
@@ -477,7 +483,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         'leap.bitmask.config.providerconfig.ProviderConfig.get_ca_cert_path',
         lambda x: where('cacert.pem'))
     def test_download_provider_info_unsupported_api_raises(self):
-        self._setup_provider_config_with("9999999", tempfile.mkdtemp())
+        self._setup_provider_config_with("9999999", mkdtemp())
         self._setup_providerbootstrapper(False)
         self._produce_dummy_provider_json()
 
@@ -488,8 +494,7 @@ class ProviderBootstrapperActiveTest(unittest.TestCase):
         'leap.bitmask.config.providerconfig.ProviderConfig.get_ca_cert_path',
         lambda x: where('cacert.pem'))
     def test_download_provider_info_unsupported_api(self):
-        self._setup_provider_config_with(provider.SUPPORTED_APIS[0],
-                                         tempfile.mkdtemp())
+        self._setup_provider_config_with(provider.SUPPORTED_APIS[0], mkdtemp())
         self._setup_providerbootstrapper(False)
         self._produce_dummy_provider_json()
 

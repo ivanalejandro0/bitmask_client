@@ -122,7 +122,7 @@ class SRPAuthTestCase(unittest.TestCase):
 
         # HACK: this is needed since it seems that the backend settings path is
         # not using the right path
-        mkdir_p('config/leap')
+        mkdir_p('config/bitmask')
 
     def tearDown(self):
         self.auth_backend._session.post = self.old_post

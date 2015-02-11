@@ -268,7 +268,7 @@ class EIPConfigTest(BaseLeapTest):
         provider_domain = 'test.provider.com'
         provider_config.get_domain = Mock(return_value=provider_domain)
 
-        expected_path = os.path.join('leap', 'providers',
+        expected_path = os.path.join('bitmask', 'providers',
                                      provider_domain, 'keys', 'client',
                                      'openvpn.pem')
 
@@ -286,7 +286,7 @@ class EIPConfigTest(BaseLeapTest):
         provider_domain = 'test.provider.com'
         provider_config.get_domain = Mock(return_value=provider_domain)
 
-        expected_path = os.path.join('leap', 'providers',
+        expected_path = os.path.join('bitmask', 'providers',
                                      provider_domain, 'keys', 'client',
                                      'openvpn.pem')
 

@@ -46,6 +46,16 @@ from leap.common.testing.basetest import BaseLeapTest
 from leap.common.files import mkdir_p
 
 
+def mkdtemp():
+    """
+    Custom mkdtemp method that uses a custom subdirectory for the leap tests.
+    """
+    sys_temp = tempfile.gettempdir()
+    leap_temp = os.path.join(sys_temp, 'leap-tests')
+    mkdir_p(leap_temp)
+    return tempfile.mkdtemp(dir=leap_temp)
+
+
 class EIPBootstrapperActiveTest(BaseLeapTest):
     @classmethod
     def setUpClass(cls):
@@ -61,13 +71,13 @@ class EIPBootstrapperActiveTest(BaseLeapTest):
 
     def setUp(self):
         self.eb = EIPBootstrapper()
-        self.old_pp = util.get_path_prefix
+        self.old_pp = util.get_bitmask_config_path
         self.old_save = EIPConfig.save
         self.old_load = EIPConfig.load
         self.old_si = SRPAuth.get_session_id
 
     def tearDown(self):
-        util.get_path_prefix = self.old_pp
+        util.bitmask_config_path = self.old_pp
         EIPConfig.save = self.old_save
         EIPConfig.load = self.old_load
         SRPAuth.get_session_id = self.old_si
@@ -97,17 +107,15 @@ class EIPBootstrapperActiveTest(BaseLeapTest):
         # of this test
         pc.get_ca_cert_path = mock.MagicMock(return_value=False)
 
-        path_prefix = tempfile.mkdtemp()
-        util.get_path_prefix = mock.MagicMock(return_value=path_prefix)
+        path_prefix = mkdtemp()
+        util.get_bitmask_config_path = mock.MagicMock(return_value=path_prefix)
         EIPConfig.save = mock.MagicMock()
         EIPConfig.load = mock.MagicMock()
 
         self.eb._download_if_needed = ifneeded
 
-        provider_dir = os.path.join(util.get_path_prefix(),
-                                    "leap",
-                                    "providers",
-                                    pc.get_domain())
+        provider_dir = os.path.join(util.get_bitmask_config_path(),
+                                    "providers", pc.get_domain())
         mkdir_p(provider_dir)
         eip_config_path = os.path.join(provider_dir,
                                        "eip-service.json")
@@ -184,17 +192,15 @@ class EIPBootstrapperActiveTest(BaseLeapTest):
         pc.get_api_version = mock.MagicMock(return_value="1")
         pc.get_ca_cert_path = mock.MagicMock(return_value=False)
 
-        path_prefix = tempfile.mkdtemp()
-        util.get_path_prefix = mock.MagicMock(return_value=path_prefix)
+        path_prefix = mkdtemp()
+        util.bitmask_config_path = mock.MagicMock(return_value=path_prefix)
         EIPConfig.save = mock.MagicMock()
         EIPConfig.load = mock.MagicMock()
 
         self.eb._download_if_needed = ifneeded
 
-        provider_dir = os.path.join(util.get_path_prefix(),
-                                    "leap",
-                                    "providers",
-                                    "somedomain")
+        provider_dir = os.path.join(util.get_bitmask_config_path(),
+                                    "providers", "somedomain")
         mkdir_p(provider_dir)
         eip_cert_path = os.path.join(provider_dir,
                                      "cert")

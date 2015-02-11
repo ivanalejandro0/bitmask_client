@@ -177,7 +177,7 @@ class ProviderConfigTest(BaseLeapTest):
         pc = self._provider_config
 
         provider_domain = sample_config['domain']
-        expected_path = os.path.join('leap', 'providers',
+        expected_path = os.path.join('bitmask', 'providers',
                                      provider_domain, 'keys', 'ca',
                                      'cacert.pem')
 
@@ -191,7 +191,7 @@ class ProviderConfigTest(BaseLeapTest):
         pc = self._provider_config
 
         provider_domain = sample_config['domain']
-        expected_path = os.path.join('leap', 'providers',
+        expected_path = os.path.join('bitmask', 'providers',
                                      provider_domain, 'keys', 'ca',
                                      'cacert.pem')
 
