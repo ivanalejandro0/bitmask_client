@@ -20,6 +20,7 @@ Some small and handy functions.
 import datetime
 import itertools
 import os
+import shutil
 
 from leap.bitmask.config import flags
 from leap.common.config import get_path_prefix as common_get_path_prefix
@@ -56,11 +57,50 @@ def flatten(things):
 # leap repetitive chores
 
 def get_path_prefix():
+    """
+    Return the bitmask prefix folder used as a base path for data storage.
+
+    :rtype: str
+    """
     return common_get_path_prefix(flags.STANDALONE)
 
 
 def get_bitmask_config_path():
+    """
+    Return the bitmask configuration folder used to store all the application
+    data.
+
+    :rtype: str
+    """
     return os.path.join(common_get_path_prefix(flags.STANDALONE), 'bitmask')
+
+
+def _move_config_leap_to_bitmask():
+    """
+    Migration helper to move the old config folder path to the new path name.
+    ~/.config/leap/ -> ~/.config/bitmask/
+
+    :return: True if succeeded, False if not neccessary.
+    :rtype: Bool
+
+    May rise IOError if the new path exists.
+    """
+    OLD_CONFIG_PATH = os.path.join(get_path_prefix(), 'leap')
+    NEW_CONFIG_PATH = os.path.join(get_path_prefix(), 'bitmask')
+
+    if not os.path.exists(OLD_CONFIG_PATH):
+        return False
+
+    if os.path.exists(NEW_CONFIG_PATH):
+        msg = ("Migration script failed: {0} -> {1}\n"
+               "Can't migrate config folder since {1} exists.\n"
+               "You need to choose whether you want to keep configs on {0} or"
+               "{1} in order to fix this conflict.")
+        msg = msg.format(OLD_CONFIG_PATH, NEW_CONFIG_PATH)
+        raise IOError(msg)
+
+    shutil.move(OLD_CONFIG_PATH, NEW_CONFIG_PATH)
+    return True
 
 
 def get_modification_ts(path):

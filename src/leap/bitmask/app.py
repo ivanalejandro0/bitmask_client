@@ -54,6 +54,7 @@ from leap.bitmask.logs.utils import create_logger
 from leap.bitmask.platform_init.locks import we_are_the_one_and_only
 from leap.bitmask.services.mail import plumber
 from leap.bitmask.util import leap_argparse, flags_to_dict
+from leap.bitmask.util import _move_config_leap_to_bitmask
 from leap.bitmask.util.requirement_checker import check_requirements
 
 from leap.common.events import server as event_server
@@ -145,6 +146,18 @@ def start_app():
         replace_stdout = False
 
     logger = create_logger(opts.debug, opts.log_file, replace_stdout)
+
+    try:
+        migration = _move_config_leap_to_bitmask()
+        if migration:
+            logger.debug("We successfully migrated your config path to its "
+                         "new name.")
+        else:
+            logger.debug("Config path name migration not needed.")
+
+    except IOError as e:
+        logger.error(e)
+        return
 
     # ok, we got logging in place, we can satisfy mail plumbing requests
     # and show logs there. it normally will exit there if we got that path.
