@@ -91,6 +91,7 @@ class Wizard(QtGui.QWizard, SignalTracker):
         self._backend_connect()
 
         self._domain = None
+        self._check_ok = False
 
         # this details are set when the provider download is complete.
         self._provider_details = None
@@ -405,7 +406,7 @@ class Wizard(QtGui.QWizard, SignalTracker):
         self.ui.lblProviderInfo.setPixmap(None)
         self.ui.lblProviderSelectStatus.setText("")
         self._domain = None
-        self.button(QtGui.QWizard.NextButton).setEnabled(False)
+        # self.button(QtGui.QWizard.NextButton).setEnabled(False)
         self.page(self.SELECT_PROVIDER_PAGE).set_completed(
             flags.SKIP_WIZARD_CHECKS)
 
@@ -673,6 +674,9 @@ class Wizard(QtGui.QWizard, SignalTracker):
         if pageId == self.SELECT_PROVIDER_PAGE:
             self._clear_register_widgets()
             skip = self.ui.rbExistingProvider.isChecked()
+            self._check_ok = False
+            self.button(QtGui.QWizard.NextButton).setText("Check")
+
             if not self._provider_checks_ok:
                 self._enable_check()
                 self._skip_provider_checks(skip)
@@ -720,7 +724,11 @@ class Wizard(QtGui.QWizard, SignalTracker):
                 return self.SERVICES_PAGE
 
         if self.currentPage() == self.page(self.SELECT_PROVIDER_PAGE):
+            if not self._check_ok:
+                return self.currentPage()
+
             if self._use_existing_provider:
+                # self.button(QtGui.QWizard.NextButton).setText("&Next >")
                 self._domain = self.ui.cbProviders.currentText()
                 if self._show_register:
                     return self.REGISTER_USER_PAGE
