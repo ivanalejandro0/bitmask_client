@@ -17,7 +17,7 @@
 """
 Provider bootstrapping
 """
-import logging
+# import logging
 import socket
 import os
 import sys
@@ -38,7 +38,9 @@ from leap.common.certs import get_digest
 from leap.common.check import leap_assert, leap_assert_type, leap_check
 from leap.common.files import check_and_fix_urw_only, get_mtime, mkdir_p
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
 
 
 class UnsupportedProviderAPI(Exception):

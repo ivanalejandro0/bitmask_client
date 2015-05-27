@@ -17,11 +17,13 @@
 """
 Backend components
 """
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
 
 # TODO [ ] Get rid of all this deferToThread mess, or at least contain
 #          all of it into its own threadpool.
 
-import logging
+# import logging
 import os
 import socket
 import time
@@ -66,7 +68,7 @@ from leap.keymanager import openpgp
 from leap.soledad.client.secrets import PassphraseTooShort
 from leap.soledad.client.secrets import NoStorageSecret
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 class ILEAPComponent(zope.interface.Interface):
@@ -483,9 +485,9 @@ class EIP(object):
                 self._signaler.signal(self._signaler.eip_stopped)
                 return
             else:
-                # msg = "Firewall is not down yet, waiting... {0} of {1}"
-                # msg = msg.format(retry, MAX_FW_WAIT_RETRIES)
-                # logger.debug(msg)
+                msg = "Firewall is not down yet, waiting... {0} of {1}"
+                msg = msg.format(retry, MAX_FW_WAIT_RETRIES)
+                logger.debug(msg)
                 time.sleep(FW_WAIT_STEP)
                 retry += 1
         logger.warning("After waiting, firewall is not down... "

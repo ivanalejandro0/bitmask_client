@@ -6,6 +6,22 @@ from leap.bitmask.logs.log_silencer import SelectiveSilencerFilter
 from leap.bitmask.logs.leap_log_handler import LeapLogHandler
 from leap.bitmask.logs.streamtologger import StreamToLogger
 from leap.bitmask.platform_init import IS_WIN
+# from leap.bitmask.config import flags
+
+import logbook
+# from logbook.queues import ZeroMQHandler
+from leap.bitmask.logs.safezmqhandler import SafeZMQHandler
+
+
+def get_logger(debug=True, logfile=None, replace_stdout=True):
+    level = logbook.NOTSET
+    # if not debug:
+    #     level = logbook.WARNING
+    handler = SafeZMQHandler('tcp://127.0.0.1:5000', multi=True, level=level)
+    handler.push_application()
+    logger = logbook.Logger('leap')
+
+    return logger
 
 
 def create_logger(debug=False, logfile=None, replace_stdout=True):

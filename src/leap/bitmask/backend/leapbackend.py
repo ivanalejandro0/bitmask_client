@@ -17,7 +17,7 @@
 """
 Backend for everything
 """
-import logging
+# import logging
 
 import zope.interface
 import zope.proxy
@@ -26,7 +26,9 @@ from leap.bitmask.backend import components
 from leap.bitmask.backend.backend import Backend
 from leap.bitmask.backend.settings import Settings
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
 
 ERROR_KEY = "error"
 PASSED_KEY = "passed"

@@ -35,8 +35,10 @@ from leap.bitmask.backend.utils import generate_zmq_certificates_if_needed
 from leap.bitmask.backend.utils import get_backend_certificates
 from leap.bitmask.config import flags
 
-import logging
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
 
 
 class ZmqREQConnection(threading.Thread):

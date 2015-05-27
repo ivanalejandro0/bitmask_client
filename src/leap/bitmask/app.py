@@ -39,6 +39,9 @@
 # M:::::::::::~NMMM7???7MMMM:::::::::::::::::::::::NMMMI??I7MMMM:::::::::::::M
 # M::::::::::::::7MMMMMMM+:::::::::::::::::::::::::::?MMMMMMMZ:::::::::::::::M
 #                (thanks to: http://www.glassgiant.com/ascii/)
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
+
 import atexit
 import multiprocessing
 import os
@@ -51,7 +54,6 @@ from leap.bitmask import __version__ as VERSION
 from leap.bitmask.config import flags
 from leap.bitmask.frontend_app import run_frontend
 from leap.bitmask.backend_app import run_backend
-from leap.bitmask.logs.utils import create_logger
 from leap.bitmask.platform_init.locks import we_are_the_one_and_only
 from leap.bitmask.services.mail import plumber
 from leap.bitmask.util import leap_argparse, flags_to_dict
@@ -137,7 +139,7 @@ def start_app():
 
     flags.CA_CERT_FILE = opts.ca_cert_file
 
-    replace_stdout = True
+    # replace_stdout = True
 
     # XXX mail repair commands disabled for now
     # if opts.repair or opts.import_maildir:
@@ -145,7 +147,7 @@ def start_app():
     #    this could be more generic with a Command class.
     #    replace_stdout = False
 
-    logger = create_logger(opts.debug, opts.log_file, replace_stdout)
+    # logger = create_logger(opts.debug, opts.log_file, replace_stdout)
 
     # ok, we got logging in place, we can satisfy mail plumbing requests
     # and show logs there. it normally will exit there if we got that path.
@@ -167,9 +169,14 @@ def start_app():
 
     check_requirements()
 
+    # import logbook
+    # logger = logbook.Logger('leap')
+    # from leap.bitmask.logs.utils import get_logger
+    # logger = get_logger()
+
     logger.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    logger.info('Bitmask version %s', VERSION)
-    logger.info('leap.mail version %s', MAIL_VERSION)
+    logger.info('Bitmask version %s' % VERSION)
+    logger.info('leap.mail version %s' % MAIL_VERSION)
     logger.info('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 
     logger.info('Starting app')

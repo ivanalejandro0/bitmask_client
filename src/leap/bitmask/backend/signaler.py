@@ -18,6 +18,9 @@
 Signaler client.
 Receives signals from the backend and sends to the signaling server.
 """
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
+
 import Queue
 import threading
 import time
@@ -28,8 +31,13 @@ from leap.bitmask.backend.api import SIGNALS
 from leap.bitmask.backend.utils import get_frontend_certificates
 from leap.bitmask.config import flags
 
-import logging
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
+# from logbook import Logger
+# logger = Logger(__name__)
+
+# from leap.bitmask.logs.utils import get_logger
+# logger = get_logger()
 
 
 class Signaler(object):

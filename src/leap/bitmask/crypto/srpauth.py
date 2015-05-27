@@ -14,9 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
 
 import binascii
-import logging
+# import logging
 import threading
 import sys
 
@@ -39,8 +41,7 @@ from leap.bitmask.util.constants import REQUEST_TIMEOUT
 from leap.common.check import leap_assert
 from leap.common.events import emit, catalog
 
-
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 class SRPAuthenticationError(Exception):
@@ -238,6 +239,7 @@ class SRPAuthImpl(object):
         :rtype: tuple
         """
         logger.debug("Starting authentication process...")
+        print("Starting authentication process...")
         try:
             auth_data = {
                 self.LOGIN_KEY: username,

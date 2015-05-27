@@ -35,6 +35,10 @@ from leap.bitmask.util.privilege_policies import LinuxPolicyChecker
 
 
 logger = logging.getLogger(__name__)
+# from logbook import Logger
+# logger = Logger(__name__)
+# from leap.bitmask.logs.utils import get_logger
+# logger = get_logger()
 
 # NOTE we could use a deferToThread here, but should
 # be aware of this bug: http://www.themacaque.com/?p=1067

@@ -18,6 +18,9 @@
 Signaling server.
 Receives signals from the signaling client and emit Qt signals for the GUI.
 """
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
+
 import os
 import threading
 import time
@@ -34,8 +37,8 @@ from leap.bitmask.backend.api import SIGNALS
 from leap.bitmask.backend.utils import get_frontend_certificates
 from leap.bitmask.config import flags
 
-import logging
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
 
 
 class SignalerQt(QtCore.QObject):

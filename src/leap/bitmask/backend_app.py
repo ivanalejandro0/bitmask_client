@@ -17,7 +17,7 @@
 """
 Start point for the Backend.
 """
-import logging
+# import logging
 import multiprocessing
 import signal
 
@@ -26,10 +26,10 @@ from leap.common.events import server as event_server
 from leap.bitmask.backend.leapbackend import LeapBackend
 from leap.bitmask.backend.utils import generate_zmq_certificates
 from leap.bitmask.config import flags
-from leap.bitmask.logs.utils import create_logger
+# from leap.bitmask.logs.utils import create_logger
 from leap.bitmask.util import dict_to_flags
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 def signal_handler(signum, frame):
@@ -58,6 +58,13 @@ def run_backend(bypass_checks=False, flags_dict=None, frontend_pid=None):
     :param flags_dict: a dict containing the flag values set on app start.
     :type flags_dict: dict
     """
+    # XXX this needs to be used here, within the call since this function is
+    # executed in a different process and it seems that the process/thread
+    # identification isn't working 100%
+    from leap.bitmask.logs.utils import get_logger
+    logger = get_logger()
+
+    logger.debug("B"*20 + " - run backend!")
     # The backend is the one who always creates the certificates. Either if it
     # is run separately or in a process in the same app as the frontend.
     if flags.ZMQ_HAS_CURVE:
@@ -79,5 +86,5 @@ def run_backend(bypass_checks=False, flags_dict=None, frontend_pid=None):
 
 
 if __name__ == '__main__':
-    logger = create_logger(debug=True)
+    # logger = create_logger(debug=True)
     run_backend()

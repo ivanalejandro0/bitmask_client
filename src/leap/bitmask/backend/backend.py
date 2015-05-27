@@ -17,6 +17,8 @@
 
 # FIXME this is missing module documentation. It would be fine to say a couple
 # of lines about the whole backend architecture.
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
 
 import json
 import os
@@ -38,8 +40,12 @@ from leap.bitmask.backend.utils import get_backend_certificates
 from leap.bitmask.config import flags
 from leap.bitmask.backend.signaler import Signaler
 
-import logging
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
+# from logbook import Logger
+# logger = Logger(__name__)
+# from leap.bitmask.logs.utils import get_logger
+# logger = get_logger()
 
 
 class TxZmqREPConnection(object):
@@ -152,15 +158,15 @@ class Backend(object):
         while self._ongoing_defers and wait < wait_max:
             time.sleep(wait_step)
             wait += wait_step
-            msg = "Waiting for running threads to finish... {0}/{1}"
-            msg = msg.format(wait, wait_max)
-            logger.debug(msg)
+            # msg = "Waiting for running threads to finish... {0}/{1}"
+            # msg = msg.format(wait, wait_max)
+            # logger.debug(msg)
 
         # after a timeout we shut down the existing threads.
         for d in self._ongoing_defers:
             d.cancel()
 
-        logger.debug("Stopping the Twisted reactor...")
+        # logger.debug("Stopping the Twisted reactor...")
         reactor.stop()
 
     def run(self):
@@ -170,15 +176,15 @@ class Backend(object):
         self._signaler.start()
         self._frontend_checker = task.LoopingCall(self._check_frontend_alive)
         self._frontend_checker.start(self.PING_INTERVAL)
-        logger.debug("Starting Twisted reactor.")
+        # logger.debug("Starting Twisted reactor.")
         reactor.run()
-        logger.debug("Finished Twisted reactor.")
+        # logger.debug("Finished Twisted reactor.")
 
     def stop(self):
         """
         Stop the server and the zmq request parse loop.
         """
-        logger.debug("Stopping the backend...")
+        # logger.debug("Stopping the backend...")
         self._signaler.stop()
         self._frontend_checker.stop()
         threads.deferToThread(self._stop_reactor)

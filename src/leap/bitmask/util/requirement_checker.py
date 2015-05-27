@@ -18,9 +18,11 @@
 """
 Utility to check the needed requirements.
 """
+from leap.bitmask.logs.utils import get_logger
+logger = get_logger()
 
 import os
-import logging
+# import logging
 
 from pkg_resources import (DistributionNotFound,
                            get_distribution,
@@ -28,7 +30,18 @@ from pkg_resources import (DistributionNotFound,
                            resource_stream,
                            VersionConflict)
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+
+# from leap.bitmask.logs.utils import get_logger
+# logger = get_logger()
+# from logbook import Logger
+# logger = Logger(__name__)
+
+# from logbook import Logger
+# from logbook.queues import ZeroMQHandler
+# handler = ZeroMQHandler('tcp://127.0.0.1:5000', multi=True)
+# handler.push_application()
+# logger = Logger('leap')
 
 
 def get_requirements():
