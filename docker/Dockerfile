@@ -17,6 +17,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     python-pyside \
     python-setuptools \
     python-virtualenv \
+    xvfb imagemagick \
     make realpath lxpolkit policykit-1 iptables && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 

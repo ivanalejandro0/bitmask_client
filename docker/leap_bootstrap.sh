@@ -20,6 +20,8 @@ set -e  # Exit immediately if a command exits with a non-zero status.
 REPOSITORIES="bitmask_client leap_pycommon soledad keymanager leap_mail bitmask_launcher leap_assets"
 PACKAGES="leap_pycommon keymanager soledad/common soledad/client leap_mail bitmask_client"
 
+# Helper to easily determine whether we are running inside a docker container
+# or not.
 _is_docker() {
     grep -q docker /proc/1/cgroup
 }
@@ -31,6 +33,8 @@ REPOS_ROOT="$BASE_PATH/repositories"  # Root path for all the needed repositorie
 VENV_DIR="$BASE_PATH/bitmask.venv"  # Root path for all the needed repositories
 
 mkdir -p $REPOS_ROOT
+
+BITMASK_APP="python $REPOS_ROOT/bitmask_client/src/leap/bitmask/app.py"
 
 PS4=">> " # for debugging
 
@@ -44,14 +48,21 @@ cc_blue="${esc}[0;34m"
 cc_red="${esc}[0;31m"
 cc_normal=`echo -en "${esc}[m\017"`
 
+# Install dependencies, this is debian (and derivate) only.
+# For other distros, look for similar names.
 apt_install_dependencies() {
     status="installing system dependencies"
     echo "${cc_green}Status: $status...${cc_normal}"
     set -x
-    sudo apt-get install -y git python-dev python-setuptools python-virtualenv python-pip libssl-dev python-openssl libsqlite3-dev g++ openvpn pyside-tools python-pyside libffi-dev libzmq-dev
+    sudo apt-get install -y git python-dev python-setuptools \
+        python-virtualenv python-pip libssl-dev python-openssl \
+        libsqlite3-dev g++ openvpn pyside-tools python-pyside \
+        libffi-dev libzmq-dev
+
     set +x
 }
 
+# Install or remove the helper files needed for Bitmask.
 helpers() {
     if [[ "$1" == "cleanup" ]]; then
         status="removing helper files"
@@ -72,6 +83,10 @@ helpers() {
     fi
 }
 
+# Clone the repositories needed to run Bitmask.
+# They can be cloned read-only or read-write (if you have access)
+# NOTE: if the folder for a repository already exist, that clone will be
+# skipped.
 clone_repos() {
     local status="clone repositories"
     echo "${cc_green}Status: $status...${cc_normal}"
@@ -96,6 +111,8 @@ clone_repos() {
     echo "${cc_green}Status: $status done!${cc_normal}"
 }
 
+# Move to a specific point in git history for each of the repositories.
+# That point is specified in a json file. Each point can be a tag or a branch.
 checkout_repos(){
     local status="checkout repositories"
     echo "${cc_green}Status: $status...${cc_normal}"
@@ -119,6 +136,7 @@ checkout_repos(){
     echo "${cc_green}Status: $status done!${cc_normal}"
 }
 
+# Create a virtualenv and upgrade pip
 create_venv() {
     local status="creating virtualenv"
     echo "${cc_green}Status: $status...${cc_normal}"
@@ -131,6 +149,8 @@ create_venv() {
     echo "${cc_green}Status: $status done.${cc_normal}"
 }
 
+# Do a 'develop mode' install for each repository.
+# NOTE: the installations are done inside the virtualenv.
 setup_develop() {
     local status="installing packages"
     echo "${cc_green}Status: $status...${cc_normal}"
@@ -148,6 +168,8 @@ setup_develop() {
     echo "${cc_green}Status: $status done.${cc_normal}"
 }
 
+# Install all the external Bitmask dependencies, they are specified on each
+# repository.
 install_dependencies() {
     local status="installing dependencies"
     echo "${cc_green}Status: $status...${cc_normal}"
@@ -161,54 +183,107 @@ install_dependencies() {
         pkg/pip_install_requirements.sh --use-leap-wheels
     done
 
-    # symlink system's PySide inside the venv
+    # symlink system's PySide inside the virtualenv
     $REPOS_ROOT/bitmask_client/pkg/postmkvenv.sh
 
-    # hack to solve gnupg version problem
+    # XXX: hack to solve gnupg version problem
     pip uninstall -y gnupg && pip install gnupg
 
     set +x
     echo "${cc_green}Status: $status done.${cc_normal}"
 }
 
+# Helper to remove the bitmask config folder
+clean_config() {
+    local status="clean config folder"
+    echo "${cc_green}Status: $status...${cc_normal}"
+    set -x  # show commands
+
+    rm -fr ~/.config/leap
+
+    set +x
+    echo "${cc_green}Status: $status done.${cc_normal}"
+}
+
+# In order to get Bitmask running on a docker container there are a couple of
+# actions that we need to do. This helper takes care of them.
+# We need as a $1 parameter the X DISPLAY variable, this is used when we need
+# to run a virtual X server.
 docker_stuff() {
     local status="doing stuff needed to run bitmask on a docker container"
     echo "${cc_green}Status: $status...${cc_normal}"
     set -x  # show commands
 
     helpers
-    lxpolkit &
+    DISPLAY=$1 lxpolkit &
     sleep 0.5
 
     # this is needed for pkexec
     mkdir -p /var/run/dbus
-    dbus-daemon --system | true
+    DISPLAY=$1 dbus-daemon --system | true
 
     set +x
     echo "${cc_green}Status: $status done.${cc_normal}"
 }
 
+# Run the bitmask client
 run() {
-    echo "${cc_green}Status: running client...${cc_normal}"
+    local status="running client"
+    echo "${cc_green}Status: $status...${cc_normal}"
     set -x
 
-    shift  # remove 'run' from arg list
+    shift  # remove 'run' from arguments list
     passthrough_args=$@
 
-    _is_docker && docker_stuff
+    _is_docker && docker_stuff ":0"
 
     source $VENV_DIR/bin/activate
     python $REPOS_ROOT/bitmask_client/src/leap/bitmask/app.py -d $passthrough_args
 
     set +x
+    echo "${cc_green}Status: $status done.${cc_normal}"
 }
 
+# Run Bitmask.
+# This is meant to be used inside a docker container that does not provide a
+# standard X11 server but a virtual one. Specifically `Xvfb`.
+# This function also takes a couple of screenshots of the running Bitmask.
+run_headless() {
+    local status="running headless client"
+    echo "${cc_green}Status: $status...${cc_normal}"
+    set -x
+
+    shift  # remove 'run' from arguments list
+    passthrough_args=$@
+
+    # This no longer works, keep it here just in case we need an alternative in the future.
+    # startx -- `which Xvfb` :1 -screen 0 1024x768x24 &
+    Xvfb :1 -screen 0 1024x768x16 &> xvfb.log  &
+    sleep 1  # wait the X server to start
+
+    _is_docker && docker_stuff ":1"
+
+    source $VENV_DIR/bin/activate
+    DISPLAY=:1 $BITMASK_APP -d $passthrough_args &
+
+    sleep 2  # wait for bitmask to start
+    DISPLAY=:1 import -window root $BASE_PATH/bitmask-started.png
+
+    sleep 15  # wait for bitmask to login
+    DISPLAY=:1 import -window root $BASE_PATH/bitmask-logged.png
+
+    set +x
+    echo "${cc_green}Status: $status done.${cc_normal}"
+}
+
+# Initialize Bitmask to be used with this script.
+# Clone repos, checkout them, install dependencies, etc.
 initialize() {
-    shift  # remove 'init'
+    shift  # remove 'init' from arguments list
     echo $@
     if [[ "$1" == "ro" ]]; then
         # echo "RO"
-        shift  # remove 'ro'
+        shift  # remove 'ro' from arg list
         clone_repos "ro"
     else
         # echo "RW"
@@ -217,18 +292,8 @@ initialize() {
 
     if [[ -z $1 ]]; then
         echo "You need to specify a bitmask.json parameter."
-        echo "for example:"
-    cat << EOF
-{
-    "bitmask_client": "0.7.0",
-    "soledad": "0.6.3",
-    "leap_pycommon": "0.3.9",
-    "keymanager": "0.3.8",
-    "leap_mail": "0.3.10",
-    "bitmask_launcher": "0.3.3",
-    "leap_assets": "master"
-}
-EOF
+        echo "To see an example go to:"
+        echo "https://github.com/leapcode/bitmask_client/blob/develop/docker/bitmask-nightly.json"
         exit 1
     fi
 
@@ -243,6 +308,8 @@ EOF
     make
     cd -
 }
+
+# Update the existing repositories and dependencies.
 update() {
     local status="updating repositories"
     echo "${cc_green}Status: $status...${cc_normal}"
@@ -250,18 +317,8 @@ update() {
 
     if [[ -z $1 ]]; then
         echo "You need to specify a bitmask.json parameter."
-        echo "for example:"
-    cat << EOF
-{
-    "bitmask_client": "0.7.0",
-    "soledad": "0.6.3",
-    "leap_pycommon": "0.3.9",
-    "keymanager": "0.3.8",
-    "leap_mail": "0.3.10",
-    "bitmask_launcher": "0.3.3",
-    "leap_assets": "master"
-}
-EOF
+        echo "To see an example go to:"
+        echo "https://github.com/leapcode/bitmask_client/blob/develop/docker/bitmask-nightly.json"
         exit 1
     fi
 
@@ -283,17 +340,18 @@ help() {
     echo
     echo "Usage: $0 {init [ro] bitmask.json | update bitmask.json | run | help | deps | helpers}"
     echo
-    echo "    init : Initialize repositories, create virtualenv and \`python setup.py develop\` all."
-    echo "           You can use \`init ro\` in order to use the https remotes if you don't have rw access."
-    echo "           The bitmask.json file contains the version that will be used for each repo."
-    echo "  update : Update the repositories and install new deps (if needed)."
-    echo "           The bitmask.json file contains the version that will be used for each repo."
-    echo "     run : Runs the client (any extra parameters will be sent to the app)."
-    echo "    help : Show this help"
+    echo "  ?.json  : The bitmask*.json file describes the version that will be used for each repo."
+    echo
+    echo "    init  : Initialize Bitmask to be used from code. Clone repos, install dependencies, etc."
+    echo "            You can use \`init ro\` in order to use the read-only remotes if you don't have rw access."
+    echo "  update  : Update the repositories and install new deps (if needed)."
+    echo "     run  : Run the client (any extra parameters will be sent to the app)."
+    echo "    help  : Show this help"
     echo " -- system helpers --"
-    echo "    deps : Install the system dependencies needed for bitmask dev (Debian based Linux ONLY)."
-    echo " helpers : Install the helper files needed to use bitmask (Linux only)."
-    echo "           You can use \`helpers cleanup\` to remove those files."
+    echo "    deps  : Install the system dependencies needed for bitmask dev (Debian based Linux ONLY)."
+    echo " helpers  : Install the helper files needed to use bitmask (Linux only)."
+    echo "            You can use \`helpers cleanup\` to remove those files."
+    echo " headless : Run bitmask in a virtual X server. Use if you know what you're doing."
     echo
 }
 
@@ -313,6 +371,12 @@ case "$1" in
         ;;
     run)
         run "$@"
+        ;;
+    headless)
+        run_headless "$@"
+        ;;
+    clean_config)
+        clean_config
         ;;
     *)
         help

@@ -8,24 +8,42 @@ run(){
     # NOTE: to get X11 socket forwarding to work we need this
     xhost local:root
 
+    # Credentials are being passed to the container for auto login
     CREDS_OPTS=''
     if [[ -n $BITMASK_CREDENTIALS ]]; then
         BITMASK_CREDENTIALS=`realpath $BITMASK_CREDENTIALS`
         CREDS_OPTS="-e BITMASK_CREDENTIALS=/data/credentials.ini -v $BITMASK_CREDENTIALS:/data/credentials.ini"
     fi
 
+    if [[ -n $BITMASK_DAEMON ]]; then
+        CONTAINER_OPTS="-d"
+    else
+        CONTAINER_OPTS="--rm -it"
+    fi
+
+    CONTAINER_SUFFIX=""
+    if [[ -n $BITMASK_HEADLESS ]]; then
+        # In case of headless bitmask we don't want to bind the X11 socket
+        X11_OPTS=""
+        RUN="headless"
+        CONTAINER_SUFFIX="-headless"
+    else
+        X11_OPTS="-v /tmp/.X11-unix:/tmp/.X11-unix"
+        X11_OPTS="$X11_OPTS -e DISPLAY=unix$DISPLAY"
+        RUN="run"
+    fi
+
     # NOTE: to use containerized VPN from the host you need to add `--net host`
-    docker run --rm -it \
+    docker run $CONTAINER_OPTS \
         --privileged \
-        -v /tmp/.X11-unix:/tmp/.X11-unix \
-        -e DISPLAY=unix$DISPLAY \
+        $X11_OPTS \
         $CREDS_OPTS \
-        -v `pwd`/data/:/data/ -v `pwd`:/SHARED/ \
+        -v `pwd`/data/:/data/ \
         -v `pwd`/data/config:/root/.config/leap \
-        -p 1984:1984 -p 2013:2013 \
+        -p 2984:1984 -p 3013:2013 \
         -e LEAP_DOCKERIZED=1 \
-        --name bitmask \
-        test/bitmask run $@
+        --name "bitmask$CONTAINER_SUFFIX" \
+        test/bitmask $RUN $@
 
     # Services' related ports
     # eip: ["80", "53", "443", "1194"]
@@ -50,9 +68,10 @@ shell(){
         --privileged \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -e DISPLAY=unix$DISPLAY \
-        -v `pwd`/data/:/data/ -v `pwd`:/SHARED/ \
+        -v `pwd`/data/:/data/ \
         -v `pwd`/data/config:/root/.config/leap \
-        -p 1984:1984 -p 2013:2013 \
+        -v `pwd`:/host/ \
+        -p 2984:1984 -p 3013:2013 \
         -e LEAP_DOCKERIZED=1 \
         --name bitmask \
         --entrypoint=bash \
@@ -75,6 +94,12 @@ update(){
         test/bitmask update /shared/bitmask.json
 }
 
+clean_config(){
+    docker run --rm \
+        -v `pwd`/data/config:/root/.config/leap \
+        test/bitmask-headless clean_config
+}
+
 build(){
     docker build -t test/bitmask .
 }
@@ -83,8 +108,8 @@ help() {
     echo ">> Bitmask on docker"
     echo "Run the bitmask app in a docker container."
     echo
-    echo "Usage: $0 {init bitmask.json | update bitmask.json | build | shell | run | help}"
-    echo        
+    echo "Usage: $0 { init bitmask.json | update bitmask.json | build | shell | run | help }"
+    echo
     echo "  ?.json : The bitmask*.json file describes the version that will be used for each repo."
     echo
     echo "    init : Clone repositories, install dependencies, and get bitmask ready to be used."
@@ -94,6 +119,16 @@ help() {
     echo "     run : Run the client (any extra parameters will be sent to the app)."
     echo "    help : Show this help"
     echo
+    echo " Notes for run: you can set environment variables to tweak how run behaves."
+    echo "  - BITMASK_CREDENTIALS='credentials.ini'"
+    echo "      Bitmask will use this file to autologin with the given credentials."
+    echo "  - BITMASK_DAEMON=1"
+    echo "      Bitmask will run in a daemonized container."
+    echo "  - BITMASK_HEADLESS=1"
+    echo "      Bitmask will run in headless mode, using a virtual X server instead the host's."
+    echo "  - LEAP_DOCKERIZED=1"
+    echo "      Bitmask will disable the email firewall. IMAP and SMTP services"
+    echo "      will bind to 0.0.0.0 instead localhost only."
 }
 
 
@@ -112,6 +147,9 @@ case "$1" in
         ;;
     shell)
         shell
+        ;;
+    clean_config)
+        clean_config
         ;;
     *)
         help
