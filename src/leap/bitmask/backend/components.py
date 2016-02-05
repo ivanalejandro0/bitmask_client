@@ -285,6 +285,26 @@ class Provider(object):
             self._signaler.prov_get_pinned_providers,
             PinnedProviders.domains())
 
+    def get_motd(self, domain, lang=None):
+        """
+        Signal a dict with the current ProviderConfig settings.
+
+        :param domain: the domain name of the provider.
+        :type domain: str
+        :param lang: the language to use for localized strings.
+        :type lang: str
+
+        Signals:
+            prov_get_details -> dict
+        """
+        import requests
+        response = requests.get(self._provider_config.get_ca_cert_uri())
+        motd = None
+        if response.ok:
+            motd = response.json()[u'text']
+
+        self._signaler.signal(self._signaler.prov_motd_ready, motd)
+
 
 class Register(object):
     """

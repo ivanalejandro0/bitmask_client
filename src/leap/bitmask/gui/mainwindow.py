@@ -266,6 +266,7 @@ class MainWindow(QtGui.QMainWindow, SignalTracker):
 
         self._center_window()
         self.ui.lblNewUpdates.setVisible(False)
+        self.ui.lblProviderMOTD.setVisible(False)
         self.ui.btnMore.setVisible(False)
         #########################################
         # We hide this in height temporarily too
@@ -369,6 +370,8 @@ class MainWindow(QtGui.QMainWindow, SignalTracker):
             return
 
         # We don't want to disconnect some signals so don't track them:
+
+        sig.backend.prov_motd_ready.connect(self._show_motd)
 
         sig.backend_bad_call.connect(self._backend_bad_call)
 
@@ -1297,6 +1300,19 @@ class MainWindow(QtGui.QMainWindow, SignalTracker):
                 # Since EIP won't start, we need to trigger
                 # the soledad setup service from here.
                 self._maybe_run_soledad_setup_checks()
+
+        self.app.backend.provider_get_motd(domain=domain, lang='en')
+
+    def _show_motd(self):
+        """
+        Show the Messate Of The Day (MOTD) to the user.
+        """
+        # TODO: get the MOTD from provider_url/v1/messages.json?locale=en
+        title = "<strong>Message of the day:</strong><br>"
+        motd = 'This is a message for you... blah blah'
+        self.ui.lblProviderMOTD.setText(title + motd)
+        self.ui.lblProviderMOTD.setVisible(True)
+        self._systray.showMessage(self.tr('Message of the day'), motd)
 
     def _on_user_logged_out(self):
         """
